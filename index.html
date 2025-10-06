@@ -9,7 +9,11 @@
 <body>
   <div class="container">
     <h1>🌦️ Weather App</h1>
-    <input type="text" id="cityInput" placeholder="Enter city name...">
+    <div class="autocomplete">
+  <input type="text" id="cityInput" placeholder="Enter city name..." autocomplete="off">
+  <div id="suggestions" class="suggestions" role="listbox" aria-label="City suggestions"></div>
+</div>
+
     <button onclick="getWeather()">Get Weather</button>
     
     <div id="result" class="result"></div>
