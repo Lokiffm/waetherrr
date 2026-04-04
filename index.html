@@ -4,69 +4,175 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Loki's Digital Space</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            asphalt: '#101216',
-            neon: '#49ff7e',
-            smoke: '#1f2937',
-            steel: '#2d3748'
-          },
-          boxShadow: {
-            neon: '0 0 40px rgba(73, 255, 126, 0.2)',
-          }
-        }
-      }
-    }
-  </script>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/howler@2.2.3/dist/howler.min.js"></script>
 </head>
-<body class="min-h-screen bg-[#090b0f] text-slate-100">
-  <div class="relative overflow-hidden">
-    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(73,255,126,0.16),_transparent_30%)]"></div>
-    <div class="absolute inset-x-0 top-0 h-24 bg-[linear-gradient(180deg,rgba(4,8,14,0.95),transparent)]"></div>
+<body class="landing-body">
+  <div class="background-layer"></div>
+  <div class="background-overlay"></div>
+  <div class="noise-layer"></div>
+  <div class="page-shell">
+    <header class="page-header">
+      <div class="brand-block">
+        <p class="brand-tag">lokiffm.github.io</p>
+        <p class="brand-sub">Frankfurt GenZ landing page with weather pulse and streetwear energy.</p>
+      </div>
+      <div class="header-actions">
+        <a href="game.html" class="button button-primary">Play Bello the Balloon 🎈</a>
+        <a href="https://github.com/Lokiffm/waetherrr" class="button button-secondary">Source</a>
+      </div>
+    </header>
 
-    <div class="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col px-6 py-8 sm:px-10">
-      <header class="flex items-center justify-between border-b border-white/10 pb-4">
-        <div class="space-y-1">
-          <p class="text-xs uppercase tracking-[0.36em] text-emerald-300/80">lokiffm.github.io</p>
-          <p class="text-sm text-slate-500">Mainhattan digital launchpad</p>
+    <main class="page-main">
+      <section class="hero-panel">
+        <span class="eyebrow">Frankfurt GenZ</span>
+        <h1 class="hero-title">Loki's Digital Space: Straight Outta FFM</h1>
+        <p class="hero-copy">A brutalist, neon-tinged launch page shaped like Mainhattan at midnight. The feel is high-contrast, streetwise, and built to spark curiosity before the next click.</p>
+        <div class="hero-actions">
+          <a href="game.html" class="button button-primary">Play Bello the Balloon 🎈</a>
+          <button id="joinFlowBtn" class="button button-secondary">Join the Flow</button>
         </div>
-        <a href="https://github.com/Lokiffm/waetherrr" class="rounded-full border border-emerald-400/20 bg-white/5 px-4 py-2 text-sm text-emerald-300 transition hover:bg-white/10">View Repo</a>
-      </header>
+      </section>
 
-      <main class="mt-12 flex flex-1 flex-col justify-center gap-8 pb-12 lg:pb-0">
-        <div class="max-w-3xl space-y-6">
-          <span class="inline-flex items-center rounded-full border border-emerald-400/20 bg-emerald-400/5 px-4 py-1 text-xs uppercase tracking-[0.36em] text-emerald-300">Frankfurt GenZ</span>
-          <h1 class="text-4xl font-black tracking-tight text-white sm:text-6xl">Loki's Digital Space: Straight Outta FFM</h1>
-          <p class="max-w-2xl text-lg leading-8 text-slate-300 sm:text-xl">Urban streetwear tones meet neon energy in a bold landing page built for the next wave of browser explorers. This page is designed to feel like the pulse of Mainhattan.</p>
-          <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
-            <a href="game.html" class="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-emerald-400 to-lime-300 px-8 py-4 text-base font-semibold text-slate-950 shadow-neon transition duration-200 hover:-translate-y-1 hover:shadow-[0_0_70px_rgba(73,255,126,0.3)]">Play Bello the Balloon 🎈</a>
-            <p class="max-w-xl text-sm text-slate-500">Responsive, neon-infused, and ready for a public-facing landing page that catches attention instantly.</p>
+      <aside class="weather-panel">
+        <div class="weather-card">
+          <p class="card-title">Weather Pulse</p>
+          <h2>Checking FFM Vibes...</h2>
+        </div>
+
+        <div class="weather-card">
+          <p class="card-title">Frankfurt</p>
+          <p id="ffmTemp" class="card-value">--°C</p>
+          <p id="ffmDesc" class="card-text">Frankfurt am Main weather incoming.</p>
+        </div>
+
+        <div class="weather-card">
+          <p class="card-title">Your City</p>
+          <p id="localTemp" class="card-value">--°C</p>
+          <p id="localDesc" class="card-text">Allow location for a local compare, or type your city below.</p>
+        </div>
+
+        <div id="locationFallback" class="fallback-card hidden">
+          <p class="card-title">No location access?</p>
+          <p class="card-text">Type your city and see how your weather matches FFM.</p>
+          <div class="fallback-form">
+            <input id="fallbackCity" placeholder="Type your city" autocomplete="off">
+            <button id="fallbackGo" class="button button-primary">Go</button>
           </div>
         </div>
-      </main>
-    </div>
-
-    <div class="pointer-events-none absolute inset-x-0 bottom-0 h-96 bg-[linear-gradient(180deg,transparent,#090b0f_85%)]"></div>
-    <div class="absolute inset-x-0 bottom-0 h-[260px] overflow-hidden">
-      <svg viewBox="0 0 1200 260" class="h-full w-full" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="glow" x1="0" x2="1" y1="0" y2="0">
-            <stop offset="0%" stop-color="#34d399" stop-opacity="0.18" />
-            <stop offset="100%" stop-color="#10b981" stop-opacity="0" />
-          </linearGradient>
-        </defs>
-        <path d="M0 170 L70 140 L130 160 L190 120 L240 134 L310 110 L380 135 L450 95 L520 136 L590 100 L660 140 L720 110 L780 146 L840 118 L900 150 L960 130 L1020 160 L1080 128 L1140 148 L1200 130 L1200 260 L0 260 Z" fill="#111827"/>
-        <path d="M0 165 L70 145 L130 155 L190 125 L240 135 L310 115 L380 138 L450 102 L520 142 L590 108 L660 147 L720 118 L780 150 L840 126 L900 153 L960 136 L1020 163 L1080 136 L1140 160 L1200 144 L1200 260 L0 260 Z" fill="url(#glow)" opacity="0.8"/>
-        <circle cx="180" cy="140" r="7" fill="#34d399" opacity="0.85" />
-        <circle cx="760" cy="122" r="5" fill="#4ade80" opacity="0.7" />
-        <rect x="560" y="90" width="14" height="60" rx="3" fill="#111827" />
-        <rect x="620" y="74" width="18" height="76" rx="4" fill="#111827" />
-      </svg>
-    </div>
+      </aside>
+    </main>
   </div>
+
+  <script>
+    const apiKey = '07ff8ff44373247ab99f630bde317b87';
+    const frankfurtCity = 'Frankfurt,DE';
+    const flowButton = document.getElementById('joinFlowBtn');
+    const ffmTemp = document.getElementById('ffmTemp');
+    const ffmDesc = document.getElementById('ffmDesc');
+    const localTemp = document.getElementById('localTemp');
+    const localDesc = document.getElementById('localDesc');
+    const locationFallback = document.getElementById('locationFallback');
+    const fallbackCity = document.getElementById('fallbackCity');
+    const fallbackGo = document.getElementById('fallbackGo');
+
+    const beat = new Howl({
+      src: ['https://assets.mixkit.co/music/preview/mixkit-chill-hipster-hop-lofi-633.mp3'],
+      volume: 0.16,
+      loop: true,
+      preload: true,
+      pool: 2
+    });
+
+    function setBodyMood() {
+      const hour = new Date().getHours();
+      if (hour >= 6 && hour < 18) {
+        document.body.style.backgroundImage = 'radial-gradient(circle at top, rgba(52, 211, 153, 0.12), transparent 40%), linear-gradient(180deg, #dbeafe, #93c5fd)';
+      } else {
+        document.body.style.backgroundImage = 'radial-gradient(circle at top, rgba(52, 211, 153, 0.12), transparent 40%), linear-gradient(180deg, #090b0f, #0f172a)';
+      }
+    }
+
+    function fetchWeather(url) {
+      if (!apiKey || apiKey === 'YOUR_OPENWEATHERMAP_KEY') {
+        console.warn('OpenWeatherMap API key is not set.');
+        return null;
+      }
+      return fetch(url).then((response) => response.ok ? response.json() : null).catch(() => null);
+    }
+
+    function updateWeatherDisplay(local, frankfurt) {
+      if (frankfurt) {
+        ffmTemp.textContent = `${Math.round(frankfurt.main.temp)}°C`;
+        ffmDesc.textContent = `${frankfurt.weather[0].main} · ${frankfurt.name}`;
+      }
+      if (local) {
+        localTemp.textContent = `${Math.round(local.main.temp)}°C`;
+        localDesc.textContent = `${local.weather[0].main} · ${local.name}`;
+      }
+    }
+
+    async function loadWeatherFromCoords(lat, lon) {
+      const [local, frankfurt] = await Promise.all([
+        fetchWeather(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`),
+        fetchWeather(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(frankfurtCity)}&appid=${apiKey}&units=metric`)
+      ]);
+      if (local) {
+        updateWeatherDisplay(local, frankfurt);
+      } else {
+        localDesc.textContent = 'Unable to load your weather locally.';
+      }
+      if (!frankfurt) {
+        ffmDesc.textContent = 'Unable to load Frankfurt weather.';
+      }
+    }
+
+    function showCityFallback() {
+      localDesc.textContent = 'Location blocked. Please type your city below.';
+      locationFallback.classList.remove('hidden');
+    }
+
+    async function fetchCityWeather(cityName) {
+      const result = await fetchWeather(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(cityName)}&appid=${apiKey}&units=metric`);
+      if (result && result.main && result.weather) {
+        updateWeatherDisplay(result, null);
+        localDesc.textContent = `Manual city: ${result.name}`;
+      } else {
+        localDesc.textContent = 'Unable to find that city. Try another name.';
+      }
+    }
+
+    function handleGeoError(error) {
+      if (error?.code !== 1) {
+        console.warn('Geolocation error:', error?.message || error);
+      }
+      showCityFallback();
+    }
+
+    fallbackGo.addEventListener('click', () => {
+      const city = fallbackCity.value.trim();
+      if (city) fetchCityWeather(city);
+    });
+
+    flowButton.addEventListener('click', () => {
+      if (!beat.playing()) {
+        beat.play();
+        flowButton.textContent = 'Flow Live';
+      }
+    });
+
+    setBodyMood();
+
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        loadWeatherFromCoords(position.coords.latitude, position.coords.longitude);
+      }, handleGeoError, { timeout: 10000 });
+    } else {
+      showCityFallback();
+    }
+  </script>
 </body>
 </html>

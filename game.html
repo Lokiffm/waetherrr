@@ -4,15 +4,306 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Play Bello the Balloon</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/howler@2.2.3/dist/howler.min.js"></script>
 </head>
-<body class="min-h-screen bg-[#090b0f] text-slate-100">
-  <div class="mx-auto flex min-h-screen max-w-4xl flex-col items-center justify-center px-6 text-center">
-    <div class="rounded-3xl border border-emerald-400/15 bg-white/5 p-10 shadow-[0_0_80px_rgba(16,185,129,0.18)] backdrop-blur-xl">
-      <h1 class="text-4xl font-black tracking-tight text-white sm:text-5xl">Play Bello the Balloon</h1>
-      <p class="mt-5 text-lg leading-8 text-slate-300">This is the launchpad for Bello’s next adventure. The game page is ready to be filled in with glowing levels, street-style flair, and balloon-powered motion.</p>
-      <a href="index.html" class="mt-8 inline-flex rounded-full bg-gradient-to-r from-emerald-400 to-lime-300 px-8 py-3 text-base font-semibold text-slate-950 transition hover:-translate-y-0.5">Back to Loki’s Space</a>
+<body class="game-body">
+  <div class="game-shell">
+    <header class="game-header">
+      <div>
+        <p class="card-title">Bello Balloon</p>
+        <h1>Tap the balloon, hear the boing, feel the weather.</h1>
+      </div>
+      <a href="index.html" class="button button-secondary">Back to Landing</a>
+    </header>
+
+    <div class="game-content">
+      <div class="game-card">
+        <div class="status-box">
+          <p class="card-title">Balloon status</p>
+          <h2 id="balloonState">Ready</h2>
+          <p id="weatherLabel">Tap Bello to pop the sound.</p>
+        </div>
+
+        <div class="stats-box">
+          <p class="card-title">Weather</p>
+          <h2 id="currentWeather">--°C</h2>
+          <p id="weatherCity">Waiting for your location...</p>
+        </div>
+
+        <div class="nearby-box">
+          <div style="display:flex;justify-content:space-between;align-items:center; gap:12px;">
+            <div>
+              <p class="card-title">Nearby cities</p>
+              <p id="nearbyHeader">Waiting for location...</p>
+            </div>
+            <button id="refreshLocation" class="button button-primary" style="border-radius: 999px;">Refresh</button>
+          </div>
+          <ul id="nearbyList"></ul>
+        </div>
+      </div>
+
+      <div class="game-panel">
+        <div class="canvas-box">
+          <p class="card-title">Bello lives here</p>
+          <h2>Tap the red balloon</h2>
+          <div class="canvas-wrap">
+            <canvas id="gameCanvas" width="420" height="620"></canvas>
+          </div>
+        </div>
+
+        <div id="cityFallback" class="fallback-box hidden">
+          <p class="card-title">Type your City</p>
+          <input id="cityInput" placeholder="Type your City" autocomplete="off">
+          <button id="cityGo">Go</button>
+        </div>
+        <p style="margin-top:16px;color:#64748b;font-size:0.95rem;">If location is denied, enter a city and Bello will still show weather info.</p>
+      </div>
     </div>
   </div>
+
+  <script>
+    const apiKey = '07ff8ff44373247ab99f630bde317b87';
+    const balloonState = document.getElementById('balloonState');
+    const weatherLabel = document.getElementById('weatherLabel');
+    const currentWeather = document.getElementById('currentWeather');
+    const weatherCity = document.getElementById('weatherCity');
+    const nearbyList = document.getElementById('nearbyList');
+    const nearbyHeader = document.getElementById('nearbyHeader');
+    const refreshLocation = document.getElementById('refreshLocation');
+    const cityFallback = document.getElementById('cityFallback');
+    const cityInput = document.getElementById('cityInput');
+    const cityGo = document.getElementById('cityGo');
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+
+    const sound = new Howl({
+      src: ['https://assets.mixkit.co/sfx/preview/mixkit-cartoon-bubble-pop-790.mp3'],
+      volume: 0.6,
+      preload: true,
+      pool: 2
+    });
+
+    const balloon = {
+      x: width / 2,
+      y: height * 0.45,
+      radius: 80,
+      vy: 0,
+      bob: 0
+    };
+
+    function getBackgroundColors() {
+      const hour = new Date().getHours();
+      if (hour >= 6 && hour < 18) {
+        return ['#c0e9ff', '#87d1ff', '#6cc7ff'];
+      }
+      return ['#091b3f', '#11265f', '#143471'];
+    }
+
+    function drawBackground() {
+      const [top, mid, bottom] = getBackgroundColors();
+      const gradient = ctx.createLinearGradient(0, 0, 0, height);
+      gradient.addColorStop(0, top);
+      gradient.addColorStop(0.55, mid);
+      gradient.addColorStop(1, bottom);
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, width, height);
+      ctx.fillStyle = 'rgba(255,255,255,0.06)';
+      for (let i = 0; i < 60; i++) {
+        const x = Math.random() * width;
+        const y = Math.random() * height;
+        ctx.beginPath();
+        ctx.arc(x, y, Math.random() * 1.3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+      if (w < 2 * r) r = w / 2;
+      if (h < 2 * r) r = h / 2;
+      this.beginPath();
+      this.moveTo(x + r, y);
+      this.arcTo(x + w, y, x + w, y + h, r);
+      this.arcTo(x + w, y + h, x, y + h, r);
+      this.arcTo(x, y + h, x, y, r);
+      this.arcTo(x, y, x + w, y, r);
+      this.closePath();
+      return this;
+    };
+
+    function drawBalloon() {
+      const gradient = ctx.createRadialGradient(balloon.x, balloon.y - 26, 10, balloon.x, balloon.y, 80);
+      gradient.addColorStop(0, '#ffd7d7');
+      gradient.addColorStop(0.2, '#ff6565');
+      gradient.addColorStop(1, '#bf0c0c');
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.ellipse(balloon.x, balloon.y, balloon.radius * 0.8, balloon.radius, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#b10b0b';
+      ctx.beginPath();
+      ctx.moveTo(balloon.x - 22, balloon.y + balloon.radius * 0.78);
+      ctx.quadraticCurveTo(balloon.x, balloon.y + balloon.radius * 1.18, balloon.x + 22, balloon.y + balloon.radius * 0.78);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.arc(balloon.x - 14, balloon.y - 18, 14, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,255,255,0.22)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(balloon.x, balloon.y + balloon.radius * 0.75);
+      ctx.lineTo(balloon.x, balloon.y + balloon.radius * 1.4);
+      ctx.stroke();
+    }
+
+    function drawWeatherBadge() {
+      ctx.fillStyle = 'rgba(15,23,42,0.92)';
+      ctx.strokeStyle = 'rgba(16,185,129,0.3)';
+      ctx.lineWidth = 3;
+      ctx.roundRect(24, 24, width - 48, 90, 26);
+      ctx.fill();
+      ctx.stroke();
+      const text = `${currentWeather.textContent} · ${weatherCity.textContent}`;
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = '700 26px Inter';
+      ctx.fillText(text, 42, 66);
+      ctx.font = '500 16px Inter';
+      ctx.fillStyle = '#cbd5e1';
+      ctx.fillText('Tap the balloon to make Bello boing!', 42, 92);
+    }
+
+    function animate() {
+      balloon.vy += 0.18;
+      balloon.y += balloon.vy;
+      if (balloon.y > height * 0.65) {
+        balloon.y = height * 0.65;
+        balloon.vy *= -0.7;
+      }
+      if (balloon.y < height * 0.22) {
+        balloon.y = height * 0.22;
+        balloon.vy *= -0.7;
+      }
+      balloon.bob += 0.03;
+      balloon.x = width / 2 + Math.sin(balloon.bob) * 10;
+      drawBackground();
+      drawBalloon();
+      drawWeatherBadge();
+      requestAnimationFrame(animate);
+    }
+
+    function updateWeather(card) {
+      if (!card || !card.main || !card.weather) return;
+      currentWeather.textContent = `${Math.round(card.main.temp)}°C`;
+      weatherCity.textContent = `${card.name} · ${card.weather[0].main}`;
+    }
+
+    function updateNearby(cities) {
+      nearbyList.innerHTML = '';
+      if (!Array.isArray(cities) || cities.length === 0) {
+        nearbyHeader.textContent = 'No nearby cities found yet.';
+        return;
+      }
+      nearbyHeader.textContent = 'Nearby weather snapshots';
+      cities.slice(0, 3).forEach((city) => {
+        const item = document.createElement('li');
+        item.className = '';
+        item.innerHTML = `<span style="font-weight:700;color:#ffffff;">${city.name}</span> · ${Math.round(city.main.temp)}°C · ${city.weather[0].main}`;
+        nearbyList.appendChild(item);
+      });
+    }
+
+    async function fetchJson(url) {
+      if (!apiKey || apiKey === 'YOUR_OPENWEATHERMAP_KEY') {
+        weatherLabel.textContent = 'Set your OpenWeather API key in game.html to enable weather.';
+        return null;
+      }
+      try {
+        const response = await fetch(url);
+        if (!response.ok) return null;
+        return await response.json();
+      } catch (error) {
+        console.error('Fetch failed', error);
+        return null;
+      }
+    }
+
+    async function fetchWeatherCoords(lat, lon) {
+      weatherLabel.textContent = 'Loading weather...';
+      const currentData = await fetchJson(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`);
+      const nearbyData = await fetchJson(`https://api.openweathermap.org/data/2.5/find?lat=${lat}&lon=${lon}&cnt=4&appid=${apiKey}&units=metric`);
+      if (currentData) {
+        updateWeather(currentData);
+      }
+      if (nearbyData?.list) {
+        updateNearby(nearbyData.list.filter((city) => city.name !== currentData?.name));
+      }
+      cityFallback.classList.add('hidden');
+      weatherLabel.textContent = 'Weather loaded on Bello.';
+    }
+
+    async function fetchWeatherCity(city) {
+      weatherLabel.textContent = 'Loading city weather...';
+      const currentData = await fetchJson(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`);
+      if (currentData) {
+        updateWeather(currentData);
+        weatherLabel.textContent = 'Weather loaded for your city.';
+      } else {
+        weatherLabel.textContent = 'City not found. Try again.';
+      }
+    }
+
+    function showCityPrompt() {
+      cityFallback.classList.remove('hidden');
+      weatherLabel.textContent = 'No location access. Type your city to continue.';
+    }
+
+    canvas.addEventListener('click', (event) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      const dx = x - balloon.x;
+      const dy = y - balloon.y;
+      if (Math.sqrt(dx * dx + dy * dy) < balloon.radius * 0.9) {
+        balloon.vy = -10;
+        sound.play();
+        balloonState.textContent = 'Boing!';
+        setTimeout(() => { balloonState.textContent = 'Tap again!'; }, 700);
+      }
+    });
+
+    cityGo.addEventListener('click', () => {
+      const city = cityInput.value.trim();
+      if (city) fetchWeatherCity(city);
+    });
+
+    refreshLocation.addEventListener('click', () => {
+      if ('geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition((position) => {
+          fetchWeatherCoords(position.coords.latitude, position.coords.longitude);
+        }, () => {
+          showCityPrompt();
+        }, { timeout: 10000 });
+      }
+    });
+
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        fetchWeatherCoords(position.coords.latitude, position.coords.longitude);
+      }, () => {
+        showCityPrompt();
+      }, { timeout: 10000 });
+    } else {
+      showCityPrompt();
+    }
+
+    animate();
+  </script>
 </body>
 </html>
