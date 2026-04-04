@@ -86,16 +86,16 @@
       src: ['https://assets.mixkit.co/sfx/preview/mixkit-cartoon-bubble-pop-790.mp3'],
       volume: 0.6,
       preload: true,
-      pool: 2
+      pool: 5
     });
 
-    const balloon = {
-      x: width / 2,
-      y: height * 0.45,
-      radius: 80,
-      vy: 0,
-      bob: 0
-    };
+    const balloons = [
+      { x: width * 0.25, y: height * 0.35, radius: 70, vy: 0, bob: 0, color: '#ec3939' },
+      { x: width * 0.5, y: height * 0.45, radius: 85, vy: 0, bob: 0.5, color: '#8b5cf6' },
+      { x: width * 0.75, y: height * 0.4, radius: 65, vy: 0, bob: 1.0, color: '#06b6d4' },
+      { x: width * 0.15, y: height * 0.6, radius: 75, vy: 0, bob: 1.5, color: '#f59e0b' },
+      { x: width * 0.85, y: height * 0.55, radius: 70, vy: 0, bob: 2.0, color: '#10b981' }
+    ];
 
     function getBackgroundColors() {
       const hour = new Date().getHours();
@@ -136,31 +136,38 @@
       return this;
     };
 
-    function drawBalloon() {
-      const gradient = ctx.createRadialGradient(balloon.x, balloon.y - 26, 10, balloon.x, balloon.y, 80);
-      gradient.addColorStop(0, '#ffd7d7');
-      gradient.addColorStop(0.2, '#ff6565');
-      gradient.addColorStop(1, '#bf0c0c');
-      ctx.fillStyle = gradient;
-      ctx.beginPath();
-      ctx.ellipse(balloon.x, balloon.y, balloon.radius * 0.8, balloon.radius, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#b10b0b';
-      ctx.beginPath();
-      ctx.moveTo(balloon.x - 22, balloon.y + balloon.radius * 0.78);
-      ctx.quadraticCurveTo(balloon.x, balloon.y + balloon.radius * 1.18, balloon.x + 22, balloon.y + balloon.radius * 0.78);
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(255,255,255,0.4)';
-      ctx.lineWidth = 5;
-      ctx.beginPath();
-      ctx.arc(balloon.x - 14, balloon.y - 18, 14, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.strokeStyle = 'rgba(255,255,255,0.22)';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(balloon.x, balloon.y + balloon.radius * 0.75);
-      ctx.lineTo(balloon.x, balloon.y + balloon.radius * 1.4);
-      ctx.stroke();
+    function drawBalloons() {
+      balloons.forEach((balloon) => {
+        const hexToRgb = (hex) => {
+          const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+          return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '236, 57, 57';
+        };
+        const rgb = hexToRgb(balloon.color);
+        const gradient = ctx.createRadialGradient(balloon.x, balloon.y - 26, 10, balloon.x, balloon.y, balloon.radius);
+        gradient.addColorStop(0, `rgba(${rgb}, 0.9)`);
+        gradient.addColorStop(0.3, `rgba(${rgb}, 0.7)`);
+        gradient.addColorStop(1, balloon.color);
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.ellipse(balloon.x, balloon.y, balloon.radius * 0.8, balloon.radius, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+        ctx.beginPath();
+        ctx.moveTo(balloon.x - 18, balloon.y + balloon.radius * 0.78);
+        ctx.quadraticCurveTo(balloon.x, balloon.y + balloon.radius * 1.15, balloon.x + 18, balloon.y + balloon.radius * 0.78);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(balloon.x - 12, balloon.y - 16, 12, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(balloon.x, balloon.y + balloon.radius * 0.75);
+        ctx.lineTo(balloon.x, balloon.y + balloon.radius * 1.35);
+        ctx.stroke();
+      });
     }
 
     function drawWeatherBadge() {
@@ -180,20 +187,22 @@
     }
 
     function animate() {
-      balloon.vy += 0.18;
-      balloon.y += balloon.vy;
-      if (balloon.y > height * 0.65) {
-        balloon.y = height * 0.65;
-        balloon.vy *= -0.7;
-      }
-      if (balloon.y < height * 0.22) {
-        balloon.y = height * 0.22;
-        balloon.vy *= -0.7;
-      }
-      balloon.bob += 0.03;
-      balloon.x = width / 2 + Math.sin(balloon.bob) * 10;
+      balloons.forEach((balloon) => {
+        balloon.vy += 0.16;
+        balloon.y += balloon.vy;
+        if (balloon.y > height * 0.68) {
+          balloon.y = height * 0.68;
+          balloon.vy *= -0.72;
+        }
+        if (balloon.y < height * 0.18) {
+          balloon.y = height * 0.18;
+          balloon.vy *= -0.72;
+        }
+        balloon.bob += 0.025;
+        balloon.x = (balloon.x - width * 0.5) * 0.98 + width * 0.5 + Math.sin(balloon.bob) * 8;
+      });
       drawBackground();
-      drawBalloon();
+      drawBalloons();
       drawWeatherBadge();
       requestAnimationFrame(animate);
     }
@@ -268,13 +277,19 @@
       const rect = canvas.getBoundingClientRect();
       const x = event.clientX - rect.left;
       const y = event.clientY - rect.top;
-      const dx = x - balloon.x;
-      const dy = y - balloon.y;
-      if (Math.sqrt(dx * dx + dy * dy) < balloon.radius * 0.9) {
-        balloon.vy = -10;
-        sound.play();
-        balloonState.textContent = 'Boing!';
-        setTimeout(() => { balloonState.textContent = 'Tap again!'; }, 700);
+      let hitBalloon = false;
+      balloons.forEach((balloon) => {
+        const dx = x - balloon.x;
+        const dy = y - balloon.y;
+        if (Math.sqrt(dx * dx + dy * dy) < balloon.radius * 0.88) {
+          sound.play();
+          balloon.vy = -12;
+          hitBalloon = true;
+        }
+      });
+      if (hitBalloon) {
+        balloonState.textContent = 'Pop!';
+        setTimeout(() => { balloonState.textContent = 'Keep tapping!'; }, 600);
       }
     });
 
