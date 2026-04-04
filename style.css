@@ -605,3 +605,47 @@ button {
   color: #cbd5e1;
   line-height: 1.5;
 }
+
+.war-cry-section {
+  margin-top: 40px;
+}
+
+.war-cry-section h2 {
+  font-size: 2rem;
+  color: #34d399;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.war-cry-grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.war-cry-card {
+  background: rgba(15, 23, 42, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 28px;
+  padding: 24px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.32);
+}
+
+.war-cry-card h3 {
+  margin: 0 0 12px;
+  color: #f8fafc;
+  font-size: 1.25rem;
+}
+
+.war-cry-card p {
+  margin: 0;
+  color: #cbd5e1;
+  line-height: 1.5;
+}
+
+.war-cry-text {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #34d399;
+  margin-bottom: 12px;
+}
