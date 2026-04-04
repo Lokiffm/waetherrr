@@ -207,23 +207,50 @@
       requestAnimationFrame(animate);
     }
 
+    const majorAirports = [
+      { name: 'Frankfurt (FRA)', lat: 50.0379, lon: 8.5622 },
+      { name: 'Munich (MUC)', lat: 48.3538, lon: 11.7861 },
+      { name: 'Berlin (BER)', lat: 52.3667, lon: 13.5033 },
+      { name: 'Cologne (CGN)', lat: 50.8659, lon: 6.8744 },
+      { name: 'Düsseldorf (DUS)', lat: 51.2895, lon: 6.7669 },
+      { name: 'London (LHR)', lat: 51.4700, lon: -0.4543 },
+      { name: 'Paris (CDG)', lat: 49.0097, lon: 2.5479 },
+      { name: 'Amsterdam (AMS)', lat: 52.3086, lon: 4.7639 },
+      { name: 'Vienna (VIE)', lat: 48.1111, lon: 16.5699 },
+      { name: 'Zurich (ZRH)', lat: 47.4647, lon: 8.5495 },
+      { name: 'Milan (MXP)', lat: 45.6306, lon: 8.7231 },
+      { name: 'Stuttgart (STR)', lat: 48.6891, lon: 9.2212 },
+      { name: 'Hamburg (HAM)', lat: 53.6304, lon: 10.0217 },
+      { name: 'Lyon (LYS)', lat: 45.7262, lon: 5.0797 },
+      { name: 'Brussels (BRU)', lat: 50.9008, lon: 4.4844 }
+    ];
+
+    function calcDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371;
+      const dLat = ((lat2 - lat1) * Math.PI) / 180;
+      const dLon = ((lon2 - lon1) * Math.PI) / 180;
+      const a = Math.sin(dLat / 2) ** 2 + Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) ** 2;
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+
     function updateWeather(card) {
       if (!card || !card.main || !card.weather) return;
       currentWeather.textContent = `${Math.round(card.main.temp)}°C`;
       weatherCity.textContent = `${card.name} · ${card.weather[0].main}`;
     }
 
-    function updateNearby(cities) {
+    function updateNearby(lat, lon) {
       nearbyList.innerHTML = '';
-      if (!Array.isArray(cities) || cities.length === 0) {
-        nearbyHeader.textContent = 'No nearby cities found yet.';
-        return;
-      }
-      nearbyHeader.textContent = 'Nearby weather snapshots';
-      cities.slice(0, 3).forEach((city) => {
+      const nearby = majorAirports.map((airport) => ({
+        ...airport,
+        distance: calcDistance(lat, lon, airport.lat, airport.lon)
+      })).sort((a, b) => a.distance - b.distance).slice(0, 4);
+      nearbyHeader.textContent = 'Nearby major airports';
+      nearby.forEach((airport) => {
         const item = document.createElement('li');
         item.className = '';
-        item.innerHTML = `<span style="font-weight:700;color:#ffffff;">${city.name}</span> · ${Math.round(city.main.temp)}°C · ${city.weather[0].main}`;
+        item.innerHTML = `<span style="font-weight:700;color:#ffffff;">${airport.name}</span> · ${Math.round(airport.distance)} km away`;
         nearbyList.appendChild(item);
       });
     }
@@ -246,15 +273,12 @@
     async function fetchWeatherCoords(lat, lon) {
       weatherLabel.textContent = 'Loading weather...';
       const currentData = await fetchJson(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`);
-      const nearbyData = await fetchJson(`https://api.openweathermap.org/data/2.5/find?lat=${lat}&lon=${lon}&cnt=4&appid=${apiKey}&units=metric`);
       if (currentData) {
         updateWeather(currentData);
+        updateNearby(lat, lon);
       }
-      if (nearbyData?.list) {
-        updateNearby(nearbyData.list.filter((city) => city.name !== currentData?.name));
-      }
-      cityFallback.classList.add('hidden');
-      weatherLabel.textContent = 'Weather loaded on Bello.';
+      cityFallback.classList.remove('hidden');
+      weatherLabel.textContent = 'Weather loaded. Search for another city below.';
     }
 
     async function fetchWeatherCity(city) {
@@ -262,15 +286,17 @@
       const currentData = await fetchJson(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`);
       if (currentData) {
         updateWeather(currentData);
-        weatherLabel.textContent = 'Weather loaded for your city.';
+        updateNearby(currentData.coord.lat, currentData.coord.lon);
+        weatherLabel.textContent = `Weather loaded for ${city}. Nearby airports shown below.`;
+        cityInput.value = '';
       } else {
-        weatherLabel.textContent = 'City not found. Try again.';
+        weatherLabel.textContent = 'City not found. Try another name.';
       }
     }
 
     function showCityPrompt() {
       cityFallback.classList.remove('hidden');
-      weatherLabel.textContent = 'No location access. Type your city to continue.';
+      weatherLabel.textContent = 'Enter your city name to view weather and nearby airports.';
     }
 
     canvas.addEventListener('click', (event) => {
@@ -296,6 +322,13 @@
     cityGo.addEventListener('click', () => {
       const city = cityInput.value.trim();
       if (city) fetchWeatherCity(city);
+    });
+
+    cityInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const city = cityInput.value.trim();
+        if (city) fetchWeatherCity(city);
+      }
     });
 
     refreshLocation.addEventListener('click', () => {
