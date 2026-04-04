@@ -431,6 +431,54 @@ button {
   padding: 14px 20px;
 }
 
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(7, 10, 17, 0.88);
+}
+
+.modal-card {
+  width: min(560px, 100%);
+  border-radius: 28px;
+  background: rgba(15, 23, 42, 0.97);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 30px;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.35);
+}
+
+.modal-card h2 {
+  margin: 0 0 12px;
+  color: #34d399;
+  font-size: clamp(1.75rem, 2.5vw, 2.5rem);
+}
+
+.modal-card input {
+  width: 100%;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.04);
+  color: #f8fafc;
+  padding: 14px 16px;
+  margin-top: 16px;
+}
+
+.modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.modal-card .card-text {
+  margin-top: 16px;
+  color: #cbd5e1;
+}
+
 @media (min-width: 900px) {
   .game-content {
     grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
@@ -446,4 +494,114 @@ button {
   .header-actions {
     justify-content: flex-start;
   }
+}
+
+.infographics-section {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.infographics-section h2 {
+  font-size: 2rem;
+  color: #34d399;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.infographic-grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.infographic-card {
+  background: rgba(15, 23, 42, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 28px;
+  padding: 24px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.32);
+}
+
+.infographic-card h3 {
+  margin: 0 0 16px;
+  color: #f8fafc;
+  font-size: 1.25rem;
+}
+
+.pie-chart {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  position: relative;
+  margin: 0 auto 16px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.slice {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.timeline-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.timeline-item p {
+  margin: 0;
+  color: #cbd5e1;
+  font-size: 0.95rem;
+}
+
+.history-section {
+  margin-top: 40px;
+}
+
+.history-section h2 {
+  font-size: 2rem;
+  color: #34d399;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.history-grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.history-card {
+  background: rgba(15, 23, 42, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 28px;
+  padding: 24px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.32);
+}
+
+.history-card h3 {
+  margin: 0 0 12px;
+  color: #f8fafc;
+  font-size: 1.25rem;
+}
+
+.history-card p {
+  margin: 0;
+  color: #cbd5e1;
+  line-height: 1.5;
 }
