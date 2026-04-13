@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Journey - Loki</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="landing-body">
+  <div class="background-layer"></div>
+  <div class="background-overlay"></div>
+  <div class="noise-layer"></div>
+  <div class="page-shell">
+    <header class="page-header">
+      <div class="brand-block">
+        <p class="brand-tag">lokiffm.github.io</p>
+        <p class="brand-sub">The timeline of a major transition—Frankfurt GenZ energy.</p>
+      </div>
+      <div class="header-actions">
+        <a href="index.html" class="button button-secondary">Back to Home</a>
+      </div>
+    </header>
+
+    <main class="page-main" style="display: block; margin-top: 32px;">
+      <section class="history-section" style="margin-top: 0; max-width: 800px; margin: 0 auto;">
+        <h2 style="text-align: left; margin-bottom: 24px;">My Journey</h2>
+        <p class="hero-copy" style="margin-bottom: 40px;">From India to Germany, balancing challenges with massive ambitions.</p>
+        
+        <div class="timeline" style="gap: 32px;">
+          
+          <div class="history-card" style="position: relative;">
+            <div class="timeline-item" style="margin-bottom: 12px;">
+              <div class="dot" style="background: #34d399;"></div>
+              <h3 style="margin: 0;">Early Years</h3>
+            </div>
+            <p>I was born in India.</p>
+          </div>
+
+          <div class="history-card" style="position: relative;">
+            <div class="timeline-item" style="margin-bottom: 12px;">
+              <div class="dot" style="background: #8b5cf6;"></div>
+              <h3 style="margin: 0;">The Move</h3>
+            </div>
+            <p>I moved to Germany, which was a significant transition.</p>
+          </div>
+
+          <div class="history-card" style="position: relative;">
+            <div class="timeline-item" style="margin-bottom: 12px;">
+              <div class="dot" style="background: #06b6d4;"></div>
+              <h3 style="margin: 0;">Education</h3>
+            </div>
+            <p>I initially attended an international school, but later transitioned to a German public school to better integrate and challenge myself.</p>
+          </div>
+
+          <div class="history-card" style="position: relative;">
+            <div class="timeline-item" style="margin-bottom: 12px;">
+              <div class="dot" style="background: #f59e0b;"></div>
+              <h3 style="margin: 0;">Current Goal</h3>
+            </div>
+            <p>I am currently working toward my Abitur (Abi).</p>
+          </div>
+
+          <div class="history-card" style="position: relative;">
+            <div class="timeline-item" style="margin-bottom: 12px;">
+              <div class="dot" style="background: #ec3939;"></div>
+              <h3 style="margin: 0;">Future Plans</h3>
+            </div>
+            <p>My goal is to pursue a degree in Aerospace Engineering at the Technical University of Munich (TUM).</p>
+          </div>
+
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    function setBodyMood() {
+      const hour = new Date().getHours();
+      if (hour >= 6 && hour < 18) {
+        document.body.style.backgroundImage = 'radial-gradient(circle at top, rgba(52, 211, 153, 0.12), transparent 40%), linear-gradient(180deg, #dbeafe, #93c5fd)';
+      } else {
+        document.body.style.backgroundImage = 'radial-gradient(circle at top, rgba(52, 211, 153, 0.12), transparent 40%), linear-gradient(180deg, #090b0f, #0f172a)';
+      }
+    }
+    setBodyMood();
+  </script>
+</body>
+</html>

@@ -21,7 +21,9 @@
         <p class="brand-sub">Frankfurt GenZ landing page with weather pulse and streetwear energy.</p>
       </div>
       <div class="header-actions">
+        <a href="journey.html" class="button button-ghost">My Journey</a>
         <a href="game.html" class="button button-primary">Play Bello the Balloon 🎈</a>
+        <button class="button button-secondary secret-entry-btn">Secret Entry</button>
         <a href="https://github.com/Lokiffm/waetherrr" class="button button-secondary">Source</a>
       </div>
     </header>
@@ -33,6 +35,7 @@
         <p class="hero-copy">A brutalist, neon-tinged launch page shaped like Mainhattan at midnight. The feel is high-contrast, streetwise, and built to spark curiosity before the next click.</p>
         <div class="hero-actions">
           <a href="game.html" class="button button-primary">Play Bello the Balloon 🎈</a>
+          <button class="button button-secondary secret-entry-btn">Secret Entry</button>
           <button id="joinFlowBtn" class="button button-secondary">Join the Flow</button>
         </div>
       </section>
@@ -67,6 +70,19 @@
     </main>
   </div>
 
+  <div id="passwordOverlay" class="modal-overlay hidden">
+    <div class="modal-card">
+      <h2>Rajputana Darbar</h2>
+      <p class="card-text">Yeh page sirf chuninda mehmano ke liye hai. Password daal kar aage jao.</p>
+      <input id="pagePassword" type="password" placeholder="Password likho" autocomplete="off">
+      <div class="modal-actions">
+        <button id="submitPassword" class="button button-primary">Chalo</button>
+        <button id="closeModal" class="button button-secondary">Band karo</button>
+      </div>
+      <p id="passwordMessage" class="card-text"></p>
+    </div>
+  </div>
+
   <script>
     const apiKey = '07ff8ff44373247ab99f630bde317b87';
     const frankfurtCity = 'Frankfurt,DE';
@@ -78,6 +94,13 @@
     const locationFallback = document.getElementById('locationFallback');
     const fallbackCity = document.getElementById('fallbackCity');
     const fallbackGo = document.getElementById('fallbackGo');
+    const secretEntryButtons = document.querySelectorAll('.secret-entry-btn');
+    const passwordOverlay = document.getElementById('passwordOverlay');
+    const pagePassword = document.getElementById('pagePassword');
+    const submitPassword = document.getElementById('submitPassword');
+    const closeModal = document.getElementById('closeModal');
+    const passwordMessage = document.getElementById('passwordMessage');
+    const secretPasswords = ['darbar123', 'jairajputana'];
 
     const beat = new Howl({
       src: ['https://assets.mixkit.co/music/preview/mixkit-chill-hipster-hop-lofi-633.mp3'],
@@ -155,6 +178,35 @@
     fallbackGo.addEventListener('click', () => {
       const city = fallbackCity.value.trim();
       if (city) fetchCityWeather(city);
+    });
+
+    function openPasswordOverlay() {
+      passwordOverlay.classList.remove('hidden');
+      passwordMessage.textContent = '';
+      pagePassword.value = '';
+      pagePassword.focus();
+    }
+
+    function closePasswordOverlay() {
+      passwordOverlay.classList.add('hidden');
+      passwordMessage.textContent = '';
+      pagePassword.value = '';
+    }
+
+    function submitPasswordCheck() {
+      const guess = pagePassword.value.trim().toLowerCase();
+      if (secretPasswords.includes(guess)) {
+        window.location.href = 'secret.html';
+      } else {
+        passwordMessage.textContent = 'Galat password. Phir se koshish karo.';
+      }
+    }
+
+    secretEntryButtons.forEach((btn) => btn.addEventListener('click', openPasswordOverlay));
+    closeModal.addEventListener('click', closePasswordOverlay);
+    submitPassword.addEventListener('click', submitPasswordCheck);
+    pagePassword.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') submitPasswordCheck();
     });
 
     flowButton.addEventListener('click', () => {
